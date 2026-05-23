@@ -1,10 +1,12 @@
-// Package notifier provides integrations for delivering digest messages
-// to external services such as Slack and email.
-//
-// Each notifier implements a simple Send(message string) error interface,
-// allowing the depwatch daemon to dispatch formatted digests produced by
-// the digest package without coupling to any specific delivery mechanism.
+// Package notifier provides implementations for delivering dependency digest
+// notifications to external services.
 //
 // Supported notifiers:
+//
 //   - SlackNotifier: posts messages to a Slack incoming webhook URL.
+//   - EmailNotifier: sends messages via SMTP using optional PlainAuth.
+//
+// Each notifier is constructed via a New* constructor that validates required
+// configuration at creation time, returning a descriptive error when fields
+// are missing or invalid.
 package notifier
