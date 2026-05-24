@@ -1,14 +1,20 @@
 # depwatch
 
-A Go daemon that monitors dependency changelogs and sends digests to Slack or email.
+A Python daemon that monitors dependency changelogs and sends digests to Slack or email.
 
 ## Installation
 
 ```bash
-go install github.com/yourname/depwatch@latest
+pip install depwatch
 ```
 
-Or download a pre-built binary from the [releases page](https://github.com/yourname/depwatch/releases).
+Or install from source:
+
+```bash
+git clone https://github.com/yourname/depwatch
+cd depwatch
+pip install .
+```
 
 ## Usage
 
@@ -51,6 +57,9 @@ depwatch check --config depwatch.yaml
 | `interval` | How often to check for updates | `24h` |
 | `notify.slack.webhook_url` | Slack incoming webhook URL | — |
 | `notify.email.to` | Recipient email address | — |
+| `notify.email.from` | Sender email address | — |
+| `notify.email.smtp_host` | SMTP server hostname | — |
+| `notify.email.smtp_port` | SMTP server port | `587` |
 
 ## License
 
