@@ -59,6 +59,14 @@ func TestFilter_Apply_ZeroSince_ReturnsAll(t *testing.T) {
 	}
 }
 
+func TestFilter_Apply_EmptyEntries(t *testing.T) {
+	f := NewFilter(baseTime, 5)
+	got := f.Apply([]Entry{})
+	if len(got) != 0 {
+		t.Fatalf("expected 0 entries for empty input, got %d", len(got))
+	}
+}
+
 func TestFilterNew_RemovesSeen(t *testing.T) {
 	seen := map[string]bool{"v1.3.0": true, "v1.1.0": true}
 	got := FilterNew(sampleEntries(), seen)
@@ -74,5 +82,13 @@ func TestFilterNew_EmptySeen_ReturnsAll(t *testing.T) {
 	got := FilterNew(sampleEntries(), map[string]bool{})
 	if len(got) != 3 {
 		t.Fatalf("expected 3 entries, got %d", len(got))
+	}
+}
+
+func TestFilterNew_AllSeen_ReturnsNone(t *testing.T) {
+	seen := map[string]bool{"v1.3.0": true, "v1.2.0": true, "v1.1.0": true}
+	got := FilterNew(sampleEntries(), seen)
+	if len(got) != 0 {
+		t.Fatalf("expected 0 entries when all are seen, got %d", len(got))
 	}
 }
