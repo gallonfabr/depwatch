@@ -30,19 +30,9 @@ func main() {
 	parser := changelog.NewParser()
 	builder := digest.NewBuilder()
 
-	var notify notifier.Notifier
-	if cfg.Slack.WebhookURL != "" {
-		notify, err = notifier.NewSlackNotifier(cfg.Slack.WebhookURL)
-		if err != nil {
-			log.Fatalf("failed to create slack notifier: %v", err)
-		}
-	} else if cfg.Email.Host != "" {
-		notify, err = notifier.NewEmailNotifier(cfg.Email)
-		if err != nil {
-			log.Fatalf("failed to create email notifier: %v", err)
-		}
-	} else {
-		log.Fatal("no notifier configured: set slack.webhook_url or email.host")
+	notify, err := buildNotifier(cfg)
+	if err != nil {
+		log.Fatalf("failed to create notifier: %v", err)
 	}
 
 	w := watcher.New(cfg, fetcher, parser, builder, notify)
@@ -68,4 +58,18 @@ func main() {
 
 	log.Printf("depwatch started (interval: %s, dependencies: %d)", cfg.Interval, len(cfg.Dependencies))
 	sched.Run(ctx)
+}
+
+// buildNotifier constructs the appropriate Notifier based on the configuration.
+// It returns an error if the selected notifier cannot be initialised, and a
+// fatal error if no notifier is configured at all.
+func buildNotifier(cfg *config.Config) (notifier.Notifier, error) {
+	if cfg.Slack.WebhookURL != "" {
+		return notifier.NewSlackNotifier(cfg.Slack.WebhookURL)
+	}
+	if cfg.Email.Host != "" {
+		return notifier.NewEmailNotifier(cfg.Email)
+	}
+	log.Fatal("no notifier configured: set slack.webhook_url or email.host")
+	return nil, nil // unreachable, but satisfies the compiler
 }
