@@ -88,6 +88,24 @@ func TestRetry_ContextCancellation(t *testing.T) {
 	}
 }
 
+// TestRetry_ContextCancelledDuringRetry verifies that a context cancelled
+// between attempts causes Retry to stop and return context.Canceled.
+func TestRetry_ContextCancelledDuringRetry(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	calls := 0
+	cfg := RetryConfig{MaxAttempts: 5, BaseDelay: time.Millisecond, MaxDelay: 5 * time.Millisecond}
+	err := Retry(ctx, cfg, func() error {
+		calls++
+		if calls == 2 {
+			cancel()
+		}
+		return errTransient
+	})
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("expected context.Canceled, got %v", err)
+	}
+}
+
 func TestPermanent_NilPassthrough(t *testing.T) {
 	if Permanent(nil) != nil {
 		t.Fatal("expected nil for Permanent(nil)")
