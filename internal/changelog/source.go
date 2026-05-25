@@ -27,6 +27,9 @@ type Source struct {
 
 // Validate returns a non-nil error when the source is misconfigured.
 func (s Source) Validate() error {
+	if s.Name == "" {
+		return ErrMissingName
+	}
 	switch s.Type {
 	case SourceHTTP:
 		if s.URL == "" {
@@ -43,4 +46,17 @@ func (s Source) Validate() error {
 		return ErrUnknownSourceType
 	}
 	return nil
+}
+
+// String returns a short human-readable representation of the source,
+// useful for logging and diagnostic output.
+func (s Source) String() string {
+	switch s.Type {
+	case SourceGitHub:
+		return string(s.Type) + ":" + s.Owner + "/" + s.Repo
+	case SourceHTTP:
+		return string(s.Type) + ":" + s.URL
+	default:
+		return string(s.Type) + ":" + s.Name
+	}
 }
