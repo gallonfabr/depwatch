@@ -80,3 +80,19 @@ func TestExpander_MultipleEntries_AllExpanded(t *testing.T) {
 		}
 	}
 }
+
+func TestExpander_EmptyInput_ReturnsEmpty(t *testing.T) {
+	e := NewExpander()
+	out := e.Apply([]Entry{})
+	if len(out) != 0 {
+		t.Errorf("expected empty slice, got %d entries", len(out))
+	}
+}
+
+func TestExpander_NilInput_ReturnsEmpty(t *testing.T) {
+	e := NewExpander()
+	out := e.Apply(nil)
+	if len(out) != 0 {
+		t.Errorf("expected empty slice, got %d entries", len(out))
+	}
+}
