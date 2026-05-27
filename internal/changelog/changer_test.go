@@ -93,3 +93,17 @@ func TestChanger_Commit_UpdatesSnapshot(t *testing.T) {
 		t.Errorf("expected v2.0.0, got %s", got[0].Version)
 	}
 }
+
+func TestChanger_HasChanged_MultipleKeys_Isolated(t *testing.T) {
+	// Verify that committing entries for one key does not affect HasChanged for another key.
+	s := NewSnapshotStore()
+	c := NewChanger(s)
+	now := time.Date(2024, 3, 1, 0, 0, 0, 0, time.UTC)
+	entriesA := []Entry{{Dependency: "libA", Version: "v1.0.0", Date: now}}
+	c.Commit("libA", entriesA)
+
+	entriesB := []Entry{{Dependency: "libB", Version: "v2.0.0", Date: now}}
+	if !c.HasChanged("libB", entriesB) {
+		t.Error("expected HasChanged=true for libB which has no prior snapshot")
+	}
+}
